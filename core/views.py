@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib import messages
 from datetime import date
-
+from django.db.models import Sum, Count
 from .models import Patient, Appointment, PaymentHistory
 from .utils import suggest_next_slot, missed_patients, frequent_time_slot
 
@@ -132,3 +132,39 @@ def collect_payment(request, appointment_id):
 
     # GET → Show simple input form
     return render(request, 'collect_payment.html', {'appointment': appointment})
+
+
+def reports(request):
+    today = timezone.localdate()
+
+    # Total collected payments
+    total_collected = Appointment.objects.aggregate(total=Sum('fee_paid'))['total'] or 0
+
+    # Total pending fees
+    total_pending = Appointment.objects.aggregate(total=Sum('fee_due'))['total'] or 0
+
+    # Total appointments
+    total_appointments = Appointment.objects.count()
+
+    # Missed appointments
+    total_missed = Appointment.objects.filter(status='Absent').count()
+
+    # Most frequent patient slots
+    patient_slots = []
+    patients = Patient.objects.all()
+    for patient in patients:
+        slot = frequent_time_slot(patient.id)
+        patient_slots.append({
+            'patient': patient.name,
+            'slot': slot
+        })
+
+    context = {
+        'total_collected': total_collected,
+        'total_pending': total_pending,
+        'total_appointments': total_appointments,
+        'total_missed': total_missed,
+        'patient_slots': patient_slots,
+    }
+
+    return render(request, 'reports.html', context)
