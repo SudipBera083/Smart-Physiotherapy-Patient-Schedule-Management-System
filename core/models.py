@@ -8,13 +8,18 @@ class Patient(models.Model):
     ]
     name = models.CharField(max_length=100)
     contact = models.CharField(max_length=15)
+    address = models.TextField(blank=True, null=True)
     medical_notes = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='New')
     total_fee = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     pending_fee = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    notes = models.TextField(blank=True, null=True) 
 
     def __str__(self):
         return self.name
+    
+
+
 
 class Appointment(models.Model):
     STATUS_CHOICES = [

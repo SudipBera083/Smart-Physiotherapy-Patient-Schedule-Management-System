@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Delete Patient</h2>
+
+<div class="alert alert-danger">
+    Are you sure you want to delete <strong>{{ patient.name }}</strong>? This action cannot be undone.
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+    <a href="{% url 'patients' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

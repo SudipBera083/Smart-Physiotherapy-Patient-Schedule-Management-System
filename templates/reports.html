@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Reports & Analytics</h2>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+            <h5>Total Collected</h5>
+            <h2 class="text-success">₹{{ total_collected }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+            <h5>Total Pending</h5>
+            <h2 class="text-danger">₹{{ total_pending }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+            <h5>Total Appointments</h5>
+            <h2 class="text-primary">{{ total_appointments }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+            <h5>Total Missed</h5>
+            <h2 class="text-warning">{{ total_missed }}</h2>
+        </div>
+    </div>
+</div>
+
+<!-- Frequent Slots Table -->
+<div class="card p-3">
+    <h4>Most Frequent Appointment Slots per Patient</h4>
+    <table class="table table-bordered mt-3">
+        <thead class="table-light">
+            <tr>
+                <th>Patient</th>
+                <th>Frequent Slot</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in patient_slots %}
+            <tr>
+                <td>{{ item.patient }}</td>
+                <td>{{ item.slot|default:"N/A" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="2">No data available</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

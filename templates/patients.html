@@ -3,7 +3,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center">
     <h2>Patients</h2>
-    <a href="#" class="btn btn-primary"><i class="bi bi-person-plus"></i> Add Patient</a>
+    <a href="{% url 'add_patient' %}" class="btn btn-primary"><i class="bi bi-person-plus"></i> Add Patient</a>
 </div>
 
 <table class="table table-bordered mt-4">
@@ -12,6 +12,7 @@
             <th>#</th>
             <th>Name</th>
             <th>Contact</th>
+            <th>Address</th>
             <th>Status</th>
             <th>Last Visit</th>
             <th>Pending Due</th>
@@ -19,20 +20,39 @@
         </tr>
     </thead>
     <tbody>
-        <!-- Example static row (Will be dynamic later) -->
+        {% for patient in patients %}
         <tr>
-            <td>1</td>
-            <td>Ramesh Kumar</td>
-            <td>9876543210</td>
-            <td><span class="badge bg-success">Regular</span></td>
-            <td>12 Feb 2025</td>
-            <td><span class="badge bg-danger">₹100 Due</span></td>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ patient.name }}</td>
+            <td>{{ patient.contact }}</td>
+            <td>{{ patient.address|default:"-" }}</td>
             <td>
-                <button class="btn btn-sm btn-info">View</button>
-                <button class="btn btn-sm btn-warning">Edit</button>
-                <button class="btn btn-sm btn-danger">Delete</button>
+                {% if patient.pending_fee == 0 %}
+                    <span class="badge bg-success">Regular</span>
+                {% else %}
+                    <span class="badge bg-warning">Pending</span>
+                {% endif %}
+            </td>
+            <td>{{ patient.last_visit|default:"-" }}</td>
+            <td>
+                {% if patient.pending_fee > 0 %}
+                    <span class="badge bg-danger">₹{{ patient.pending_fee }} Due</span>
+                {% else %}
+                    <span class="badge bg-success">Paid</span>
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'add_appointment' %}?patient_id={{ patient.id }}" class="btn btn-sm btn-primary">Add Appointment</a>
+                <a href="{% url 'collect_payment' patient.id %}" class="btn btn-sm btn-success">Collect Payment</a>
+                <a href="{% url 'edit_patient' patient.id %}" class="btn btn-sm btn-warning">Edit</a>
+                <a href="{% url 'delete_patient' patient.id %}" class="btn btn-sm btn-danger">Delete</a>
             </td>
         </tr>
+        {% empty %}
+        <tr>
+            <td colspan="8" class="text-center">No patients found.</td>
+        </tr>
+        {% endfor %}
     </tbody>
 </table>
 {% endblock %}

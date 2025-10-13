@@ -5,6 +5,10 @@ from datetime import date
 from django.db.models import Sum, Count
 from .models import Patient, Appointment, PaymentHistory
 from .utils import suggest_next_slot, missed_patients, frequent_time_slot
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .models import Patient
+
 
 # -----------------------------
 # Dashboard View
@@ -40,8 +44,81 @@ def dashboard(request):
 # Patients List View
 # -----------------------------
 def patients(request):
-    patients = Patient.objects.all()
-    return render(request, 'patients.html', {'patients': patients})
+    patients_list = Patient.objects.all()
+    # Add last visit date for each patient
+    for patient in patients_list:
+        last_appointment = patient.appointment_set.order_by('-date').first()
+        patient.last_visit = last_appointment.date if last_appointment else None
+
+    return render(request, 'patients.html', {'patients': patients_list})
+
+
+# -----------------------------
+# Add Patients 
+# -----------------------------
+
+def add_patient(request):
+    if request.method == "POST":
+        name = request.POST.get('name')
+        contact = request.POST.get('contact')
+        address = request.POST.get('address')
+        total_fee = float(request.POST.get('total_fee', 0))
+        notes = request.POST.get('notes', '')
+
+        if not name or not contact:
+            messages.error(request, "Name and contact are required.")
+            return redirect('add_patient')
+
+        # Create patient
+        patient = Patient.objects.create(
+            name=name,
+            contact=contact,
+            address=address,
+            total_fee=total_fee,
+            pending_fee=total_fee,  # initially pending = total fee
+            notes=notes
+        )
+
+        messages.success(request, f"Patient {patient.name} added successfully.")
+        return redirect('patients')
+
+    return render(request, 'add_patient.html')
+
+
+
+# -----------------------------
+# Edit Patient
+# -----------------------------
+def edit_patient(request, patient_id):
+    patient = get_object_or_404(Patient, id=patient_id)
+
+    if request.method == "POST":
+        patient.name = request.POST.get('name')
+        patient.contact = request.POST.get('contact')
+        patient.address = request.POST.get('address')
+        patient.total_fee = float(request.POST.get('total_fee', patient.total_fee))
+        patient.notes = request.POST.get('notes', patient.notes)
+        patient.save()
+
+        messages.success(request, f"Patient {patient.name} updated successfully.")
+        return redirect('patients')
+
+    return render(request, 'edit_patient.html', {'patient': patient})
+
+# -----------------------------
+# Delete Patient
+# -----------------------------
+def delete_patient(request, patient_id):
+    patient = get_object_or_404(Patient, id=patient_id)
+
+    if request.method == "POST":
+        patient.delete()
+        messages.success(request, f"Patient {patient.name} deleted successfully.")
+        return redirect('patients')
+
+    return render(request, 'delete_patient.html', {'patient': patient})
+
+
 
 # -----------------------------
 # Add Appointment View
