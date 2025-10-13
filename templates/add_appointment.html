@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Add Appointment</h2>
+
+<form method="POST" class="mt-3">
+    {% csrf_token %}
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label">Patient</label>
+            <select name="patient" class="form-select" required>
+                <option value="">Select Patient</option>
+                {% for patient in patients %}
+                <option value="{{ patient.id }}">{{ patient.name }} (Pending: ₹{{ patient.pending_fee }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Date</label>
+            <input type="date" name="date" class="form-control" value="{{ today|default:today }}" required>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Time</label>
+            <input type="time" name="time" class="form-control" value="{{ suggested_time }}" required>
+            <small class="text-muted">Suggested slot: {{ suggested_time }}</small>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label">Fee Paid Today (₹)</label>
+            <input type="number" name="fee_paid" class="form-control" value="0">
+        </div>
+        <div class="col-md-6 mt-4">
+            <button class="btn btn-success mt-2">💾 Add Appointment</button>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-2">Cancel</a>
+        </div>
+    </div>
+</form>
+{% endblock %}

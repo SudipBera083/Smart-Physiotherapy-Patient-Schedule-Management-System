@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center">
+    <h2>Appointments</h2>
+    <a href="/appointments/add/" class="btn btn-primary"><i class="bi bi-calendar-plus"></i> New Appointment</a>
+</div>
+
+<div class="alert alert-info mt-3">
+    💡 <strong>Smart Suggestion:</strong> Next free slot available at <strong>4:30 PM</strong>. Based on past visits, this patient prefers evening timings.
+</div>
+
+<table class="table table-bordered mt-3">
+    <thead class="table-light">
+        <tr>
+            <th>Time</th>
+            <th>Patient</th>
+            <th>Status</th>
+            <th>Payment</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>11:00 AM</td>
+            <td>Sita Devi</td>
+            <td><span class="badge bg-warning">Pending</span></td>
+            <td><span class="badge bg-danger">₹200 Due</span></td>
+            <td>
+                <button class="btn btn-sm btn-success">✅ Attended</button>
+                <button class="btn btn-sm btn-secondary">❌ Absent</button>
+                <button class="btn btn-sm btn-primary">💰 Collect</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+{% endblock %}

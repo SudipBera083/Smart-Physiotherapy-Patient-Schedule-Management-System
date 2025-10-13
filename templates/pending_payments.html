@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Pending Payments</h2>
+
+<table class="table table-bordered mt-4">
+    <thead class="table-dark text-white">
+        <tr>
+            <th>Patient</th>
+            <th>Total Sessions</th>
+            <th>Paid</th>
+            <th>Due</th>
+            <th>Last Session</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Ramesh Kumar</td>
+            <td>5</td>
+            <td>₹400</td>
+            <td><span class="badge bg-danger">₹100 Due</span></td>
+            <td>14 Feb 2025</td>
+            <td><button class="btn btn-sm btn-primary">Collect Now</button></td>
+        </tr>
+    </tbody>
+</table>
+{% endblock %}

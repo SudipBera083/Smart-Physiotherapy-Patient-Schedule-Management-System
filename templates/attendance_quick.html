@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Mark Attendance</h2>
+
+<div class="alert alert-warning mt-3">
+    ⚠ These patients haven't been marked today.
+</div>
+
+<table class="table table-bordered">
+    <thead class="table-light">
+        <tr>
+            <th>Time</th>
+            <th>Patient</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>2:00 PM</td>
+            <td>Mohan</td>
+            <td><span class="badge bg-warning">Not Marked</span></td>
+            <td>
+                <button class="btn btn-sm btn-success">✅ Attended</button>
+                <button class="btn btn-sm btn-danger">❌ Absent</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+{% endblock %}

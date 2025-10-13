@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Dashboard</h2>
+
+<!-- Alerts Section -->
+{% if missed_today %}
+<div class="alert alert-warning">
+    ⚠ Reminder: {{ missed_today|length }} patient(s) missed today's appointment:
+    {% for patient in missed_today %}
+        <strong>{{ patient.name }}</strong>{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if pending_payments %}
+<div class="alert alert-danger">
+    💰 Pending payments: {{ pending_payments|length }} appointment(s) with dues
+</div>
+{% endif %}
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+            <h5>Today's Appointments</h5>
+            <h2 class="text-primary fw-bold">{{ todays_appointments.count }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+            <h5>Upcoming Appointments</h5>
+            <h2 class="text-warning fw-bold">{{ upcoming_appointments.count }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+            <h5>Pending Payments</h5>
+            <h2 class="text-danger fw-bold">{{ pending_payments.count }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+            <h5>Missed / Absent</h5>
+            <h2 class="text-secondary fw-bold">{{ missed_appointments.count }}</h2>
+        </div>
+    </div>
+</div>
+
+<!-- Today's Appointments Table -->
+<div class="card p-3 mb-4">
+    <h4>Today's Schedule</h4>
+    <table class="table table-bordered mt-3">
+        <thead class="table-light">
+            <tr>
+                <th>Time</th>
+                <th>Patient</th>
+                <th>Status</th>
+                <th>Payment</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appointment in todays_appointments %}
+            <tr class="{% if appointment.status == 'Absent' %}table-danger{% endif %}">
+                <td>{{ appointment.time }}</td>
+                <td>{{ appointment.patient.name }}</td>
+                <td>
+                    {% if appointment.status == 'Attended' %}
+                        <span class="badge bg-success">{{ appointment.status }}</span>
+                    {% elif appointment.status == 'Absent' %}
+                        <span class="badge bg-danger">{{ appointment.status }}</span>
+                    {% else %}
+                        <span class="badge bg-warning">{{ appointment.status }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if appointment.fee_due > 0 %}
+                        <span class="badge bg-danger">₹{{ appointment.fee_due }} Due</span>
+                    {% else %}
+                        <span class="badge bg-success">Paid</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'mark_attendance' appointment.id 'Attended' %}" class="btn btn-success btn-sm">✅ Attended</a>
+                    <a href="{% url 'mark_attendance' appointment.id 'Absent' %}" class="btn btn-secondary btn-sm">❌ Absent</a>
+                    <a href="{% url 'collect_payment' appointment.id %}" class="btn btn-primary btn-sm">💰 Collect</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">No appointments today</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Upcoming Appointments Table -->
+<div class="card p-3 mb-4">
+    <h4>Upcoming Appointments</h4>
+    <table class="table table-bordered mt-3">
+        <thead class="table-light">
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Patient</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appointment in upcoming_appointments %}
+            <tr>
+                <td>{{ appointment.date }}</td>
+                <td>{{ appointment.time }}</td>
+                <td>{{ appointment.patient.name }}</td>
+                <td>{{ appointment.notes }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">No upcoming appointments</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

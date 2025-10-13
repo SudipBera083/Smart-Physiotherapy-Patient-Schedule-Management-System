@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Collect Payment for {{ appointment.patient.name }}</h2>
+
+<p>Total Fee: ₹{{ appointment.fee_paid|add:appointment.fee_due }} | Paid: ₹{{ appointment.fee_paid }} | Due: ₹{{ appointment.fee_due }}</p>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label class="form-label">Amount Paid Today (₹)</label>
+        <input type="number" name="amount" class="form-control" value="0" required>
+    </div>
+    <button class="btn btn-success">💰 Collect Payment</button>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Add Appointment</h2>
+
+<form method="POST" class="mt-3">
+    {% csrf_token %}
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label">Patient</label>
+            <select name="patient" id="patientSelect" class="form-select" required onchange="updateSuggestedTime()">
+                <option value="">Select Patient</option>
+                {% for patient in patients %}
+                <option value="{{ patient.id }}" data-suggested="{{ suggested_times.patient.id }}">
+                    {{ patient.name }} (Pending: ₹{{ patient.pending_fee }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Date</label>
+            <input type="date" name="date" class="form-control" value="{{ today|default:today }}" required>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Time</label>
+            <input type="time" name="time" id="timeInput" class="form-control" required>
+            <small class="text-muted" id="suggestedTimeLabel"></small>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label">Fee Paid Today (₹)</label>
+            <input type="number" name="fee_paid" class="form-control" value="0">
+        </div>
+        <div class="col-md-6 mt-4">
+            <button class="btn btn-success mt-2">💾 Add Appointment</button>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-2">Cancel</a>
+        </div>
+    </div>
+</form>
+
+<script>
+    const patientSelect = document.getElementById('patientSelect');
+    const timeInput = document.getElementById('timeInput');
+    const suggestedLabel = document.getElementById('suggestedTimeLabel');
+
+    // Dictionary of patient ID → suggested time
+    const suggestedTimes = {
+        {% for patient_id, time in suggested_times.items %}
+        "{{ patient_id }}": "{{ time }}",
+        {% endfor %}
+    };
+
+    function updateSuggestedTime() {
+        const selected = patientSelect.value;
+        if (selected && suggestedTimes[selected]) {
+            timeInput.value = suggestedTimes[selected];
+            suggestedLabel.innerText = "Suggested slot: " + suggestedTimes[selected];
+        } else {
+            timeInput.value = "";
+            suggestedLabel.innerText = "";
+        }
+    }
+
+    // Initialize on page load
+    updateSuggestedTime();
+</script>
+
+{% endblock %}

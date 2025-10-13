@@ -1,0 +1,141 @@
+
+
+# 📝 **Software Requirements Specification (SRS)**
+
+### Project: **Smart Physiotherapy Patient & Schedule Management System**
+
+### Technology: **Django (Python), Bootstrap UI**
+
+### Client: **Independent Physiotherapist (Rural Practice)**
+
+---
+
+## 1. **Introduction**
+
+### 1.1 Purpose
+
+The purpose of this software is to help a physiotherapist in a rural area efficiently manage **patients, appointments, partial payments, attendance, reminders, and recommendations** using a smart web application.
+
+### 1.2 Scope
+
+The system will:
+
+* Allow storing and managing patient profiles.
+* Schedule appointments with **smart recommended time slots**.
+* Track **attendance (Present/Absent)**.
+* Manage **fee collection with support for partial payments and pending dues**.
+* Display **dashboard with Today’s and Upcoming Sessions**.
+* Provide **reminders and intelligent suggestions** based on previous activity.
+
+### 1.3 Definitions
+
+* **Appointment** – A scheduled therapy session.
+* **Partial Payment** – When the patient pays only part of the fee.
+* **Recommendation Engine** – The logic that suggests best time slots, reminders, and dues.
+
+---
+
+## 2. **Overall Description**
+
+### 2.1 User Characteristics
+
+| User                    | Description                                                  |
+| ----------------------- | ------------------------------------------------------------ |
+| Physiotherapist (Admin) | Can manage everything from dashboard. Only one login needed. |
+
+### 2.2 System Environment
+
+* **Web-based** (runs in browser)
+* **Local or hosted server**
+* **Responsive design**
+
+### 2.3 Assumptions & Dependencies
+
+* Therapist has basic internet or local network access.
+* Mobile responsive design required.
+* Application should work on **low-speed networks**.
+
+---
+
+## 3. **Functional Requirements**
+
+### 3.1 **User Authentication**
+
+* Admin login (username/password).
+* Secure session management.
+
+### 3.2 **Patient Management**
+
+* Add/Edit/Delete/View patient details.
+* Medical condition notes.
+* Auto tagging based on frequency: **New / Regular / Critical**
+
+### 3.3 **Appointment Scheduling**
+
+* Manual scheduling with date & time.
+* **Smart Slot Recommendation**:
+
+  * Suggests nearest free time.
+  * Based on patient history (time preference).
+  * Avoids time collision.
+* **Next Appointment Suggestion** after marking attended.
+
+### 3.4 **Dashboard**
+
+* Display:
+
+  * ✅ Today’s Appointments
+  * 📅 Upcoming Appointments (Next 7 Days)
+  * ⚠ Pending Fee Patients
+  * ❌ Missed / Absent Sessions
+
+### 3.5 **Attendance Tracking**
+
+* Mark as ✅ Attended or ❌ Absent.
+* System suggests **reschedule** if absent.
+
+### 3.6 **Payment & Due Tracking**
+
+* Enter session fee → enter **Paid Amount**.
+* System auto-calculates **Due Amount**.
+* Shows **due reminders** when patient comes next time.
+
+### 3.7 **Recommendation & Alerts**
+
+* **Pending payment alert** when selecting that patient.
+* **Time slot suggestion** based on session gaps.
+* **Frequent time preference suggestion** based on historical booking.
+* **Missed appointment reminder** for absent patients.
+
+### 3.8 **Reports & Filters**
+
+* Patients with **pending dues**
+* **Missed sessions**
+* **Completed sessions**
+* Date-wise appointment list
+
+---
+
+## 4. **Non-Functional Requirements**
+
+| Category                             | Requirement                                                  |
+| ------------------------------------ | ------------------------------------------------------------ |
+| **Performance**                      | Dashboard should load under 2 seconds.                       |
+| **Usability**                        | Simple UI with large buttons (for quick use on mobile).      |
+| **Security**                         | Only authenticated access.                                   |
+| **Scalability**                      | Should support up to 1000+ patients smoothly.                |
+| **Maintainability**                  | Clean Django modular architecture (models, views, services). |
+| **Offline Support (Optional Later)** | Ability to work on localhost without constant internet.      |
+
+---
+
+## 5. **Technology Stack**
+
+| Layer      | Technology                                     |
+| ---------- | ---------------------------------------------- |
+| Backend    | Django (Python)                                |
+| Frontend   | HTML, Bootstrap/Tailwind                       |
+| Database   | SQLite (local) / PostgreSQL (if needed online) |
+| Auth       | Django in-built auth                           |
+| Deployment | Can run locally or on VPS/cloud                |
+
