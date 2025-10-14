@@ -41,8 +41,8 @@
         <a href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
         <a href="{% url 'patients' %}"><i class="bi bi-people"></i> Patients</a>
         <a href="{% url 'all_appointments' %}"><i class="bi bi-calendar-check"></i> Appointments</a>
-        <a href="#"><i class="bi bi-cash-coin"></i> Pending Payments</a>
-        <a href="#"><i class="bi bi-clipboard-data"></i> Reports</a>
+        <a href="{% url 'pending_payments' %}"><i class="bi bi-cash-coin"></i> Pending Payments</a>
+        <a href="{% url 'reports' %}"><i class="bi bi-clipboard-data"></i> Reports</a>
         <hr>
         <a href="#" class="text-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
     </div>

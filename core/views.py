@@ -227,6 +227,22 @@ def collect_payment(request, appointment_id):
 
     return render(request, 'collect_payment.html', {'appointment': appointment})
 
+# -------------------------
+# Pending Payments
+# -------------------------
+from django.shortcuts import render, get_object_or_404
+from .models import Appointment
+
+def pending_payments(request):
+    # Fetch all appointments with fee_due > 0
+    pending_appointments = Appointment.objects.select_related('patient').filter(fee_due__gt=0).order_by('date', 'time')
+    return render(request, 'pending_payments.html', {'pending_appointments': pending_appointments})
+
+
+# --------------------------
+# Report view
+# -------------------------
+
 
 def reports(request):
     today = timezone.localdate()
