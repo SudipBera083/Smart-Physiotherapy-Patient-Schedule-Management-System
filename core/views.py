@@ -123,23 +123,25 @@ def delete_patient(request, patient_id):
 # -----------------------------
 # Add Appointment View
 # -----------------------------
+from decimal import Decimal
+
 def add_appointment(request):
-    patients = Patient.objects.all()  # for dropdown
+    patients = Patient.objects.all()
 
     if request.method == "POST":
         patient_id = request.POST.get('patient')
-        date_val = request.POST.get('date')
-        time_val = request.POST.get('time')
-        fee_paid = float(request.POST.get('fee_paid', 0))
+        date = request.POST.get('date')
+        time = request.POST.get('time')
+        fee_paid = Decimal(request.POST.get('fee_paid', '0'))
 
         patient = Patient.objects.get(id=patient_id)
-        fee_due = max(patient.total_fee - fee_paid, 0)
+        fee_due = max(Decimal(patient.total_fee) - fee_paid, Decimal('0'))
 
         # Create appointment
         appointment = Appointment.objects.create(
             patient=patient,
-            date=date_val,
-            time=time_val,
+            date=date,
+            time=time,
             fee_paid=fee_paid,
             fee_due=fee_due,
         )
@@ -151,17 +153,13 @@ def add_appointment(request):
         messages.success(request, f"Appointment added for {patient.name}")
         return redirect('dashboard')
 
-    # GET request → show form with smart time suggestion
-    suggested_times = {}
-    for patient in patients:
-        # Either use frequent time or next free slot
-        suggested_times[patient.id] = frequent_time_slot(patient.id) or suggest_next_slot(patient.id)
-
-    context = {
+    suggested_time = suggest_next_slot(patient_id=None)
+    return render(request, 'add_appointment.html', {
         'patients': patients,
-        'suggested_times': suggested_times
-    }
-    return render(request, 'add_appointment.html', context)
+        'suggested_times': suggested_time,
+        'today': timezone.localdate(),
+    })
+
 
 # -----------------------------
 # Mark Attendance
@@ -179,35 +177,47 @@ def mark_attendance(request, appointment_id, status):
 # -----------------------------
 # Collect Partial Payment
 # -----------------------------
+from decimal import Decimal
+from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib import messages
+from .models import Appointment, PaymentHistory
+
 def collect_payment(request, appointment_id):
     appointment = get_object_or_404(Appointment, id=appointment_id)
+    patient = appointment.patient  # Shortcut
 
     if request.method == "POST":
-        amount = float(request.POST.get('amount', 0))
-        if amount <= 0:
-            messages.error(request, "Invalid amount")
+        try:
+            amount = Decimal(request.POST.get('amount', '0'))
+        except:
+            messages.error(request, "Invalid amount entered")
             return redirect('dashboard')
 
-        # Update appointment fee_paid and fee_due
+        if amount <= 0:
+            messages.error(request, "Amount must be greater than zero.")
+            return redirect('dashboard')
+
+        if amount > appointment.fee_due:
+            amount = appointment.fee_due  # Prevent over-collection
+
+        # ✅ SUBTRACT AMOUNT CORRECTLY
         appointment.fee_paid += amount
-        appointment.fee_due = max(appointment.fee_due - amount, 0)
+        appointment.fee_due = max(appointment.fee_due - amount, Decimal('0'))
         appointment.save()
 
-        # Update patient pending fee
-        patient = appointment.patient
+        # ✅ Update patient pending fee also
         patient.pending_fee = appointment.fee_due
         patient.save()
 
-        # Record payment history
+        # ✅ Save payment history
         PaymentHistory.objects.create(
             appointment=appointment,
             amount_paid=amount
         )
 
-        messages.success(request, f"Collected ₹{amount} from {patient.name}")
+        messages.success(request, f"₹{amount} collected from {patient.name}. Remaining due: ₹{appointment.fee_due}")
         return redirect('dashboard')
 
-    # GET → Show simple input form
     return render(request, 'collect_payment.html', {'appointment': appointment})
 
 

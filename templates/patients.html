@@ -28,22 +28,29 @@
             <td>{{ patient.address|default:"-" }}</td>
             <td>
                 {% if patient.pending_fee == 0 %}
-                    <span class="badge bg-success">Regular</span>
+                <span class="badge bg-success">Regular</span>
                 {% else %}
-                    <span class="badge bg-warning">Pending</span>
+                <span class="badge bg-warning">Pending</span>
                 {% endif %}
             </td>
             <td>{{ patient.last_visit|default:"-" }}</td>
             <td>
                 {% if patient.pending_fee > 0 %}
-                    <span class="badge bg-danger">₹{{ patient.pending_fee }} Due</span>
+                <span class="badge bg-danger">₹{{ patient.pending_fee }} Due</span>
                 {% else %}
-                    <span class="badge bg-success">Paid</span>
+                <span class="badge bg-success">Paid</span>
                 {% endif %}
             </td>
             <td>
-                <a href="{% url 'add_appointment' %}?patient_id={{ patient.id }}" class="btn btn-sm btn-primary">Add Appointment</a>
-                <a href="{% url 'collect_payment' patient.id %}" class="btn btn-sm btn-success">Collect Payment</a>
+                <a href="{% url 'add_appointment' %}?patient_id={{ patient.id }}" class="btn btn-sm btn-primary">Add
+                    Appointment</a>
+                {% if patient.appointment_set.last %}
+                <a href="{% url 'collect_payment' patient.appointment_set.last.id %}"
+                    class="btn btn-sm btn-success">Collect Payment</a>
+                {% else %}
+                <button class="btn btn-sm btn-secondary" disabled>No Appointments</button>
+                {% endif %}
+
                 <a href="{% url 'edit_patient' patient.id %}" class="btn btn-sm btn-warning">Edit</a>
                 <a href="{% url 'delete_patient' patient.id %}" class="btn btn-sm btn-danger">Delete</a>
             </td>

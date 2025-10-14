@@ -1,17 +1,38 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Collect Payment for {{ appointment.patient.name }}</h2>
+<div class="container mt-4">
+    <div class="card shadow p-4">
+        <h3 class="mb-3">💰 Collect Payment</h3>
 
-<p>Total Fee: ₹{{ appointment.fee_paid|add:appointment.fee_due }} | Paid: ₹{{ appointment.fee_paid }} | Due: ₹{{ appointment.fee_due }}</p>
+        <div class="mb-3">
+            <strong>Patient:</strong> {{ appointment.patient.name }} <br>
+            <strong>Appointment Date:</strong> {{ appointment.date }} <br>
+            <strong>Time:</strong> {{ appointment.time }} <br>
+            <strong>Total Fee:</strong> ₹{{ appointment.patient.total_fee }} <br>
+            <strong>Already Paid:</strong> ₹{{ appointment.fee_paid }} <br>
+            <strong>Pending Fee:</strong> 
+            {% if appointment.fee_due > 0 %}
+                <span class="badge bg-danger">₹{{ appointment.fee_due }} Due</span>
+            {% else %}
+                <span class="badge bg-success">No Due</span>
+            {% endif %}
+        </div>
 
-<form method="POST">
-    {% csrf_token %}
-    <div class="mb-3">
-        <label class="form-label">Amount Paid Today (₹)</label>
-        <input type="number" name="amount" class="form-control" value="0" required>
+        {% if appointment.fee_due > 0 %}
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="amount" class="form-label">Enter Amount to Collect:</label>
+                <input type="number" step="0.01" name="amount" class="form-control" placeholder="Enter amount" required>
+            </div>
+
+            <button type="submit" class="btn btn-success">✅ Collect Payment</button>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">⬅ Back</a>
+        </form>
+        {% else %}
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">⬅ Back</a>
+        {% endif %}
     </div>
-    <button class="btn btn-success">💰 Collect Payment</button>
-    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
-</form>
+</div>
 {% endblock %}
