@@ -118,7 +118,14 @@ def delete_patient(request, patient_id):
 
     return render(request, 'delete_patient.html', {'patient': patient})
 
+#------------------------------
+# Appointment view
+# -----------------------------
+from .models import Appointment
 
+def all_appointments(request):
+    appointments = Appointment.objects.select_related('patient').order_by('-date', '-time')
+    return render(request, 'all_appointments.html', {'appointments': appointments})
 
 # -----------------------------
 # Add Appointment View
