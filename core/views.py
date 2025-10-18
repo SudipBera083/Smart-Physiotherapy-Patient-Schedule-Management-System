@@ -8,11 +8,19 @@ from .utils import suggest_next_slot, missed_patients, frequent_time_slot
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Patient
+from django.contrib.auth.decorators import login_required
 
+
+# -----------------------------
+# Landing Page
+# -----------------------------
+def index(request):
+    return render(request, "home.html")
 
 # -----------------------------
 # Dashboard View
 # -----------------------------
+@login_required
 def dashboard(request):
     today = timezone.localdate()
 
@@ -43,6 +51,7 @@ def dashboard(request):
 # -----------------------------
 # Patients List View
 # -----------------------------
+@login_required
 def patients(request):
     patients_list = Patient.objects.all()
     # Add last visit date for each patient
@@ -56,7 +65,7 @@ def patients(request):
 # -----------------------------
 # Add Patients 
 # -----------------------------
-
+@login_required
 def add_patient(request):
     if request.method == "POST":
         name = request.POST.get('name')
@@ -89,6 +98,7 @@ def add_patient(request):
 # -----------------------------
 # Edit Patient
 # -----------------------------
+@login_required
 def edit_patient(request, patient_id):
     patient = get_object_or_404(Patient, id=patient_id)
 
@@ -108,6 +118,7 @@ def edit_patient(request, patient_id):
 # -----------------------------
 # Delete Patient
 # -----------------------------
+@login_required
 def delete_patient(request, patient_id):
     patient = get_object_or_404(Patient, id=patient_id)
 
@@ -123,6 +134,7 @@ def delete_patient(request, patient_id):
 # -----------------------------
 from .models import Appointment
 
+@login_required
 def all_appointments(request):
     appointments = Appointment.objects.select_related('patient').order_by('-date', '-time')
     return render(request, 'all_appointments.html', {'appointments': appointments})
@@ -132,6 +144,7 @@ def all_appointments(request):
 # -----------------------------
 from decimal import Decimal
 
+@login_required
 def add_appointment(request):
     patients = Patient.objects.all()
 
@@ -171,6 +184,7 @@ def add_appointment(request):
 # -----------------------------
 # Mark Attendance
 # -----------------------------
+@login_required
 def mark_attendance(request, appointment_id, status):
     """
     status = 'Attended' or 'Absent'
@@ -189,6 +203,8 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from .models import Appointment, PaymentHistory
 
+
+@login_required
 def collect_payment(request, appointment_id):
     appointment = get_object_or_404(Appointment, id=appointment_id)
     patient = appointment.patient  # Shortcut
@@ -233,6 +249,8 @@ def collect_payment(request, appointment_id):
 from django.shortcuts import render, get_object_or_404
 from .models import Appointment
 
+
+@login_required
 def pending_payments(request):
     # Fetch all appointments with fee_due > 0
     pending_appointments = Appointment.objects.select_related('patient').filter(fee_due__gt=0).order_by('date', 'time')
@@ -243,7 +261,7 @@ def pending_payments(request):
 # Report view
 # -------------------------
 
-
+@login_required
 def reports(request):
     today = timezone.localdate()
 
@@ -278,3 +296,42 @@ def reports(request):
     }
 
     return render(request, 'reports.html', context)
+
+# --------------------------
+# Login view
+# -------------------------
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            messages.success(request, f"Welcome, {user.username}!")
+            return redirect('dashboard')
+        else:
+            messages.error(request, "Invalid username or password.")
+
+    return render(request, 'login.html')
+
+# --------------------------
+# Logout view
+# -------------------------
+
+def logout_view(request):
+    logout(request)
+    messages.success(request, "You have been logged out.")
+    return redirect('login')
