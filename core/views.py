@@ -5,10 +5,12 @@ from datetime import date
 from django.db.models import Sum, Count
 from .models import Patient, Appointment, PaymentHistory
 from .utils import suggest_next_slot, missed_patients, frequent_time_slot
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from .models import Patient
 from django.contrib.auth.decorators import login_required
+from decimal import Decimal
+from django.contrib.auth import authenticate, login, logout
+
+
+
 
 
 # -----------------------------
@@ -132,7 +134,7 @@ def delete_patient(request, patient_id):
 #------------------------------
 # Appointment view
 # -----------------------------
-from .models import Appointment
+
 
 @login_required
 def all_appointments(request):
@@ -142,7 +144,7 @@ def all_appointments(request):
 # -----------------------------
 # Add Appointment View
 # -----------------------------
-from decimal import Decimal
+
 
 @login_required
 def add_appointment(request):
@@ -198,11 +200,6 @@ def mark_attendance(request, appointment_id, status):
 # -----------------------------
 # Collect Partial Payment
 # -----------------------------
-from decimal import Decimal
-from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib import messages
-from .models import Appointment, PaymentHistory
-
 
 @login_required
 def collect_payment(request, appointment_id):
@@ -246,9 +243,6 @@ def collect_payment(request, appointment_id):
 # -------------------------
 # Pending Payments
 # -------------------------
-from django.shortcuts import render, get_object_or_404
-from .models import Appointment
-
 
 @login_required
 def pending_payments(request):
@@ -300,13 +294,6 @@ def reports(request):
 # --------------------------
 # Login view
 # -------------------------
-
-
-
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.contrib import messages
-
 
 def login_view(request):
     if request.user.is_authenticated:
